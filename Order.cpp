@@ -5,7 +5,9 @@ Order::Order(std::string request)
         std::string token;
         std::istringstream iss(request);
         iss >> token;
-        id = token;
+        id = stoi(token);
+        iss >> token;
+        userid = stoi(token);
         iss >> token;
         type = token[0];
         iss >> token;
@@ -14,4 +16,6 @@ Order::Order(std::string request)
         price = stoi(token);
         iss >> token;
         quantity = stoi(token);
+        price_fetched = 0;
+        sqlMutex = new std::mutex;
     }

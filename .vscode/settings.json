@@ -51,6 +51,23 @@
         "thread": "cpp",
         "typeinfo": "cpp",
         "set": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "cstring": "cpp",
+        "condition_variable": "cpp",
+        "list": "cpp",
+        "mutex": "cpp",
+        "cinttypes": "cpp",
+        "csignal": "cpp",
+        "any": "cpp",
+        "bitset": "cpp",
+        "chrono": "cpp",
+        "codecvt": "cpp",
+        "complex": "cpp",
+        "optional": "cpp",
+        "future": "cpp",
+        "iomanip": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp",
+        "*.ipp": "cpp"
     }
 }
