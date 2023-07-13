@@ -17,5 +17,6 @@ Order::Order(std::string request)
         iss >> token;
         quantity = stoi(token);
         price_fetched = 0;
+        init_quantity=quantity;
         sqlMutex = new std::mutex;
     }

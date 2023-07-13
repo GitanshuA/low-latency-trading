@@ -4,7 +4,7 @@ std::vector<std::shared_ptr<boost::beast::websocket::stream<boost::asio::basic_s
 void WebSockets::socketAcceptorThread()
 {
     boost::asio::io_context ioContext;
-    boost::asio::ip::tcp::acceptor acceptor(ioContext, {boost::asio::ip::tcp::v4(), 8080});
+    boost::asio::ip::tcp::acceptor acceptor(ioContext, {boost::asio::ip::address::from_string(DatabaseHandler::address), 9003});
     // Main loop to accept WebSocket connections
     while (true)
     {
@@ -25,16 +25,31 @@ void WebSockets::handleWebSocket(boost::asio::ip::tcp::socket &&socket)
     ws->accept();
     {
         std::lock_guard<std::mutex> socketlock(socketMutex);
-        WebSockets::openConnections.push_back(ws);
+        openConnections.push_back(ws);
     }
     boost::beast::multi_buffer buffer;
 
     // Main loop to handle WebSocket messages
     while (true)
     {
-        // Receive and handle WebSocket messages
-        ws->read(buffer);
-        onMessage(*ws, buffer);
+        try
+        {
+            // Receive and handle WebSocket messages
+            ws->read(buffer);
+            onMessage(*ws, buffer);
+        }
+        catch(const boost::beast::system_error& e)
+        {
+            std::lock_guard<std::mutex> lock(socketMutex);
+            std::cout<<"User Disconnected: "<<e.what()<<std::endl;
+            for(auto i = openConnections.begin(); i!=openConnections.end(); i++)
+            {
+                if((*i).get()==ws.get())
+                openConnections.erase(i);
+                break;
+            }
+            break;
+        }
     }
 }
 
@@ -59,25 +74,29 @@ void WebSockets::onMessage(boost::beast::websocket::stream<boost::asio::ip::tcp:
 
 void WebSockets::broadcastThread()
 {
-    std::string output;
-
-    // Retrieve outgoing WebSocket messages
+    while (true)
     {
-        std::unique_lock<std::mutex> lock(outputMutex);
+        std::string output;
 
-        // Wait for new output
-        outputCV.wait(lock, []{ return !outputQueue.empty(); });
-
-        output = std::move(outputQueue.front());
-        outputQueue.pop();
-    }
-
-    {
-        std::lock_guard<std::mutex> socketlock(socketMutex);
-        for (auto &conn : WebSockets::openConnections)
+        // Retrieve outgoing WebSocket messages
         {
-            // parallel processing can be added
-            conn->write(boost::asio::buffer(output));
+            std::unique_lock<std::mutex> lock(outputMutex);
+
+            // Wait for new output
+            outputCV.wait(lock, []
+                          { return !outputQueue.empty(); });
+
+            output = std::move(outputQueue.front());
+            outputQueue.pop();
+        }
+
+        {
+            std::lock_guard<std::mutex> socketlock(socketMutex);
+            for (auto &conn : openConnections)
+            {
+                // parallel processing can be added
+                conn->write(boost::asio::buffer(output));
+            }
         }
     }
 }

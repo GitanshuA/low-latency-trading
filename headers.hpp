@@ -41,8 +41,8 @@ public: // Access Modifier to be changed
     int id, userid;
     std::string stock;
     char type;
-    int price, price_fetched;
-    int quantity;
+    int price, price_fetched; //price_fetched not required for Buying Orders (introduce inherited Sell Order class)
+    int quantity, init_quantity;
     Order(std::string request);
     std::mutex *sqlMutex; //storage issue to be handled (pooling can resolve this)
 };
@@ -93,6 +93,8 @@ public:
     static void init();
     static std::string address, username, password;
     static void CreateOrder(Order);
+    static void UpdateOrderS(int id, int qty_fulfill, int price_fetched, std::mutex *sqlMutex);
+    static void UpdateOrderB(int id, int qty_fulfill, std::mutex *sqlMutex);
     DatabaseHandler();
     ~DatabaseHandler();
 };
