@@ -9,14 +9,8 @@
   <p align="center">
     An attempt at implementing a basic low-latency trading system using C++ and WebSocket
     <br />
-    <a href="https://github.com/GitanshuA/low-latency-trading"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/GitanshuA/low-latency-trading"><strong>Explore the code »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/GitanshuA/low-latency-trading">View Demo</a>
-    ·
-    <a href="https://github.com/GitanshuA/low-latency-trading/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/GitanshuA/low-latency-trading/issues">Request Feature</a>
   </p>
 </div>
 
@@ -133,7 +127,7 @@ In order to run the program, the following dependencies need to be installed:-
    ```
    Enter the Server IP address and credentials for the Database Server when prompted
    Now the backend server will start running and listening for WebSocket connections
-2. Now on your web browser open `localhost/frontend` or `[SERVER_IP_ADDRESS]/frontend`. This will take you to the client webpage where you can see 
+2. Now on your web browser open `localhost/frontend/index.php` or `[SERVER_IP_ADDRESS]/frontend/index.php`. This will take you to the client webpage where you can see 
    the options to trade various stocks
 3. By clicking on a stock, you can see the trade requests for that stock published by other users. The trade requests from users are broadcasted to     other users at live-time using WebSocket.
 4. In the orders section, the details of pending as well as completed orders are displayed.  
