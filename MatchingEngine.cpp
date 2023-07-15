@@ -6,7 +6,7 @@ bool MatchingEngine::MatchWithSell(Order &order)
     bool completed{false};
     for (auto itr = OrderBooks::BookManager[order.stock].SellingTree.begin(); itr != OrderBooks::BookManager[order.stock].SellingTree.end();)
     {
-        Limit &limit = const_cast<Limit &>(*itr); // Something fishy about this (If causes error, use pointer)
+        Limit &limit = const_cast<Limit &>(*itr);
         if (order.quantity < 1 || limit.value > order.price)
             break;
         else
@@ -18,13 +18,14 @@ bool MatchingEngine::MatchWithSell(Order &order)
                 order.quantity -= fulfill;
                 cur_front.quantity -= fulfill;
                 cur_front.price_fetched+=(fulfill*order.price);
+
+                //Update Matched Order Status [UPDATE STATUS]
                 std::thread UpdateThread(DatabaseHandler::UpdateOrderS,cur_front.id, cur_front.init_quantity-cur_front.quantity, cur_front.price_fetched, cur_front.sqlMutex);
                 UpdateThread.detach();
 
                 if (cur_front.quantity == 0)
                 {
-                    // add code for existing order completion [UPDATE STATUS]
-                    limit.list.pop_front(); // As list is indexed we can use (total-removed) mech for deleting orders
+                    limit.list.pop_front();
                 }
 
                 // update existing order quantity
@@ -65,27 +66,27 @@ bool MatchingEngine::MatchWithBuy(Order &order)
                 order.quantity -= fulfill;
                 cur_front.quantity -= fulfill;
                 order.price_fetched+=(fulfill*limit.value);
+
+                //Update Matched Order Status [UPDATE STATUS]
                 std::thread UpdateThread(DatabaseHandler::UpdateOrderB,cur_front.id, cur_front.init_quantity-cur_front.quantity, cur_front.sqlMutex);
                 UpdateThread.detach();
 
                 if (cur_front.quantity == 0)
                 {
-                    // add code for existing order completion [UPDATE STATUS]
-                    limit.list.pop_front(); // As list is indexed we can use (total-removed) mech for deleting orders
+                    limit.list.pop_front();
                 }
                 // update existing order quantity
                 if (order.quantity == 0)
                 {
                     // add code for what to do when a new order gets fulfilled [UPDATE STATUS]
-                    // std::cout << "Order " << order.id << " sold for " << limit.value << "\n";
                     completed = true;
                     std::thread UpdateThread(DatabaseHandler::UpdateOrderS,order.id, order.init_quantity-order.quantity, order.price_fetched, order.sqlMutex);
                     UpdateThread.detach();
                     return completed;
                 }
             }
-            std::advance(itr, 1);
-            OrderBooks::BookManager[order.stock].BuyingTree.erase(itr.base());
+            OrderBooks::BookManager[order.stock].BuyingTree.erase(--(itr.base()));
+            itr = OrderBooks::BookManager[order.stock].BuyingTree.rbegin();
         }
     }
     // Update new order quantity in database

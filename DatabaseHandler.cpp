@@ -16,8 +16,9 @@ void DatabaseHandler::init()
     sql::Statement *stmt = con->createStatement();
     stmt->execute("CREATE DATABASE IF NOT EXISTS TradingDB;");
     stmt->execute("USE TradingDB");
-    stmt->execute("CREATE TABLE IF NOT EXISTS Sell_Orders(order_id INT PRIMARY KEY, user_id INT, ticker_id VARCHAR(8), qty INT, pub_price INT, qty_fulfill INT DEFAULT 0, price_fetched INT DEFAULT 0);");
-    stmt->execute("CREATE TABLE IF NOT EXISTS Buy_Orders(order_id INT PRIMARY KEY, user_id INT, ticker_id VARCHAR(8), qty INT, pub_price INT, qty_fulfill INT DEFAULT 0);");
+    stmt->execute("CREATE TABLE IF NOT EXISTS Sell_Orders(order_id INT PRIMARY KEY, user_id INT, ticker_id VARCHAR(8), qty INT, pub_price INT, qty_fulfill INT DEFAULT 0, price_fetched INT DEFAULT 0, order_time datetime);");
+    stmt->execute("CREATE TABLE IF NOT EXISTS Buy_Orders(order_id INT PRIMARY KEY, user_id INT, ticker_id VARCHAR(8), qty INT, pub_price INT, qty_fulfill INT DEFAULT 0, order_time datetime);");
+    stmt->execute("CREATE TABLE IF NOT EXISTS Users(username VARCHAR(32) PRIMARY KEY, password VARCHAR(256) NOT NULL, user_id INT, orders INT DEFAULT 0);");
     delete stmt;
     con->close();
     delete con;
@@ -36,9 +37,9 @@ void DatabaseHandler::CreateOrder(Order o)
     outputCV.notify_one();
     DatabaseHandler dh;
     if (o.type == 'S')
-        dh.stmt->execute("INSERT INTO Sell_Orders(order_id, user_id, ticker_id, qty, pub_price) VALUES(" + std::to_string(o.id) + ", " + std::to_string(o.userid) + ", \"" + o.stock + "\", " + std::to_string(o.quantity) + ", " + std::to_string(o.price) + ")");
+        dh.stmt->execute("INSERT INTO Sell_Orders(order_id, user_id, ticker_id, qty, pub_price, order_time) VALUES(" + std::to_string(o.id) + ", " + std::to_string(o.userid) + ", \"" + o.stock + "\", " + std::to_string(o.quantity) + ", " + std::to_string(o.price) + ", now());");
     else
-        dh.stmt->execute("INSERT INTO Buy_Orders(order_id, user_id, ticker_id, qty, pub_price) VALUES(" + std::to_string(o.id) + ", " + std::to_string(o.userid) + ", \"" + o.stock + "\", " + std::to_string(o.quantity) + ", " + std::to_string(o.price) + ")");
+        dh.stmt->execute("INSERT INTO Buy_Orders(order_id, user_id, ticker_id, qty, pub_price, order_time) VALUES(" + std::to_string(o.id) + ", " + std::to_string(o.userid) + ", \"" + o.stock + "\", " + std::to_string(o.quantity) + ", " + std::to_string(o.price) + ", now());");
 }
 
 void DatabaseHandler::UpdateOrderS(int id, int qty_fulfill, int price_fetched, std::mutex *sqlMutex)

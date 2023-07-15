@@ -37,7 +37,7 @@
 
 class Order
 {
-public: // Access Modifier to be changed
+public:
     int id, userid;
     std::string stock;
     char type;
@@ -71,12 +71,11 @@ class OrderBooks
 public:
     static std::unordered_map<std::string, OrderBooks> BookManager;
     // static std::unordered_map<int, Order> OrderTracker; //For deleting and editing orders
-public: // Access Modifier to be changed
+public:
     std::set<Limit> SellingTree;
     std::set<Limit> BuyingTree;
 };
 
-// Order fulfillment should happen parallely while not constraining new orders at io level
 class MatchingEngine
 {
 public:
@@ -107,8 +106,7 @@ public:
     static void socketAcceptorThread();
     static void handleWebSocket(boost::asio::ip::tcp::socket&& socket);
     static void onMessage(boost::beast::websocket::stream<boost::asio::ip::tcp::socket>& ws, boost::beast::multi_buffer& buffer);
-    static void broadcastThread();
-    static void sendMessage(); 
+    static void broadcastThread(); 
 };
 
 extern std::queue<std::string> inputQueue;

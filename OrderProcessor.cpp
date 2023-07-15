@@ -6,9 +6,7 @@ void ProcessOrder(Order order)
 {
     if(order.type=='B')
     {
-        //Slight prone to error if the value is not in map
         auto itr = OrderBooks::BookManager[order.stock].BuyingTree.find(Limit(order.price));
-        //This if condition has to be changed to deal with cancelled orders(0 Quantity in found list)
         
         if(itr !=OrderBooks::BookManager[order.stock].BuyingTree.end())
         {

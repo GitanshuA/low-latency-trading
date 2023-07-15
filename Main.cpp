@@ -7,13 +7,7 @@ std::queue<std::string> outputQueue;
 std::mutex outputMutex;
 std::condition_variable outputCV;
 
-//Logic Thread Not Required (Can be added if I start handling orders for different tickers seperately)
-// void logicThread(std::string &&request)
-// {
-//     std::lock_guard<std::mutex> lock(logicMutex);
-//     ProcessRequest(request);
-// }
-
+//Threads for handling main logic can be introduced if different tickers are handled separately
 
 int main()
 {
@@ -31,6 +25,6 @@ int main()
         inputQueue.pop();
         ProcessRequest(std::move(request));
     }
-
+    Broadcast.join();
     WSAcceptorThread.join();
 }

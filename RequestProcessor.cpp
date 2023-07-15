@@ -15,7 +15,6 @@ void ProcessRequest(std::string request)
     Order new_order(request);
     std::thread OrderInsertThread(DatabaseHandler::CreateOrder, new_order);
     OrderInsertThread.detach();
-    std::cout<<"Started"<<std::endl;
     ProcessOrder(std::move(new_order));
-    std::cout<<"Processed"<<std::endl;
+    std::cout<<"Processed: "<<request<<std::endl;
 }

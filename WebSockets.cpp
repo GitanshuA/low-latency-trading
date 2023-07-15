@@ -20,36 +20,47 @@ void WebSockets::socketAcceptorThread()
 // Function to handle a WebSocket connection
 void WebSockets::handleWebSocket(boost::asio::ip::tcp::socket &&socket)
 {
-    std::shared_ptr<boost::beast::websocket::stream<boost::asio::ip::tcp::socket>> ws = std::make_shared<boost::beast::websocket::stream<boost::asio::ip::tcp::socket>>(std::move(socket));
-    // boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws(std::move(socket));
-    ws->accept();
+    try
     {
-        std::lock_guard<std::mutex> socketlock(socketMutex);
-        openConnections.push_back(ws);
-    }
-    boost::beast::multi_buffer buffer;
-
-    // Main loop to handle WebSocket messages
-    while (true)
-    {
-        try
+        std::shared_ptr<boost::beast::websocket::stream<boost::asio::ip::tcp::socket>> ws = std::make_shared<boost::beast::websocket::stream<boost::asio::ip::tcp::socket>>(std::move(socket));
+        // boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws(std::move(socket));
+        ws->accept();
         {
-            // Receive and handle WebSocket messages
-            ws->read(buffer);
-            onMessage(*ws, buffer);
+            std::lock_guard<std::mutex> socketlock(socketMutex);
+            openConnections.push_back(ws); 
         }
-        catch(const boost::beast::system_error& e)
+        std::cout << "User Connected\nTotal Users: " << openConnections.size() << std::endl;
+        boost::beast::multi_buffer buffer;
+
+        // Main loop to handle WebSocket messages
+        while (true)
         {
-            std::lock_guard<std::mutex> lock(socketMutex);
-            std::cout<<"User Disconnected: "<<e.what()<<std::endl;
-            for(auto i = openConnections.begin(); i!=openConnections.end(); i++)
+            try
             {
-                if((*i).get()==ws.get())
-                openConnections.erase(i);
+                // Receive and handle WebSocket messages
+                ws->read(buffer);
+                onMessage(*ws, buffer);
+            }
+            catch (const boost::beast::system_error &e)
+            {
+                std::lock_guard<std::mutex> lock(socketMutex);
+                std::cerr << "WebSocket exception: " << e.what() << std::endl;
+                for (auto i = openConnections.begin(); i != openConnections.end(); i++)
+                {
+                    if ((*i).get() == ws.get())
+                    {
+                        openConnections.erase(i);
+                        std::cout << "Users Rem: " << openConnections.size() << std::endl;
+                        break;
+                    }
+                }
                 break;
             }
-            break;
         }
+    }
+    catch (const boost::beast::system_error &e)
+    {
+        std::cerr << "WebSocket exception: " << e.what() << std::endl;
     }
 }
 
@@ -94,8 +105,15 @@ void WebSockets::broadcastThread()
             std::lock_guard<std::mutex> socketlock(socketMutex);
             for (auto &conn : openConnections)
             {
-                // parallel processing can be added
-                conn->write(boost::asio::buffer(output));
+                // Parallel processing can be added
+                try
+                {
+                    conn->write(boost::asio::buffer(output));
+                }
+                catch (const boost::beast::system_error &e)
+                {
+                    std::cerr << "WebSocket exception: " << e.what() << std::endl;
+                }
             }
         }
     }
