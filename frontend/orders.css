@@ -1,0 +1,82 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    background-image:  url(./images/bg\ img.avif);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-attachment: fixed;
+    font-family: 'Poppins', sans-serif;
+    z-index: -2;
+}
+.overlay-rgb{
+    height: fit-content; /*100vh*/
+    background: linear-gradient(rgba(0, 0, 0, 0.254),rgba(2, 5, 18, 0.491));
+    z-index: -1;
+}
+a{
+    text-decoration: none;
+    color: inherit;
+}
+.nav{
+    color: white;
+    font-size: 34px;
+    background-color: transparent;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 25px;
+    padding: 16px 40px 16px;
+    font-family: 'Poppins', sans-serif;
+    background-color: rgb(2,5,18, 0.65);
+    opacity: 1 !important;
+    position: fixed;
+    z-index: 1;
+}
+.nav>.icon{
+    display: flex;
+    flex-basis: 100%;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+}
+
+.navbar{
+    margin-bottom: 100px;
+}
+.nav>div{
+    padding: 5px 8px;
+    transition: all 0.3s ease-in;
+}
+.nav>div:hover{
+    background-color: rgb(196, 215, 178,0.2);
+    border-radius: 5px;
+}
+#orders{
+    display: flex;
+    justify-content: center;
+}
+ .order-list{
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    width: 100%;
+}
+/* .order-list>*{
+    flex-basis: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+} */ 
+.res{
+
+    text-align: center;
+    display: flex;
+}
+.res>*{
+    flex-basis: 20%;
+}
