@@ -30,21 +30,37 @@ $_SESSION['orders'] = $_COOKIE['orders_var'];
             $conn = new mysqli('192.168.29.101', 'admin', 'admin', 'TradingDB');
             $user_id = $_SESSION['user_id'];
 
-            $sellSql = "SELECT ticker_id, qty_fulfill, price_fetched, order_time FROM Sell_Orders WHERE NOT qty_fulfill = qty AND user_id=$user_id";
+            $sellSql = "SELECT ticker_id, qty, qty_fulfill, price_fetched, order_time FROM Sell_Orders WHERE user_id=$user_id";
             $sellResult = $conn->query($sellSql);
 
-            $buySql = "SELECT ticker_id, qty_fulfill, order_time, pub_price FROM Buy_Orders WHERE NOT qty_fulfill = qty AND user_id=$user_id";
+            $buySql = "SELECT ticker_id, qty, qty_fulfill, order_time, pub_price FROM Buy_Orders WHERE user_id=$user_id";
             $buyResult = $conn->query($buySql);
+
+            
 
             $combinedResults = array();
             while ($sellRow = $sellResult->fetch_assoc()) {
-                $sellRow['type'] = '<font color="red">Sell</font>';
+                if($sellRow['qty']==$sellRow['qty_fulfill'])
+                {
+                    $sellRow['type'] = '<font color="red">Sold completely</font>';
+                }
+                else {
+
+                    $sellRow['type'] = '<font color="red">Sell</font>';
+                }
                 $combinedResults[] = $sellRow;
             }
             while ($buyRow = $buyResult->fetch_assoc()) {
                 $buyRow['price_fetched'] = $buyRow['qty_fulfill'] * $buyRow['pub_price'];
                 unset($buyRow['pub_price']);
-                $buyRow['type'] = '<font color="green">Buy</font>';
+                if($buyRow['qty']==$buyRow['qty_fulfill'])
+                {
+                    $buyRow['type'] = '<font color="green">Bought completely</font>';
+                }
+                else {
+                    
+                    $buyRow['type'] = '<font color="green">Buy</font>';
+                }
                 $combinedResults[] = $buyRow;
             }
 
