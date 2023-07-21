@@ -17,8 +17,10 @@ $_SESSION['orders'] = $_COOKIE['orders_var'];
         <section id="navbar">
             <nav class="nav">
                 <div class="icon">
+                <div>
                     <i class="fa-regular fa-circle-user fa-xl"></i>
                     <span><?php echo $_SESSION['username'];?> </span>
+                </div>
                 </div>
                 <div><a href="./frontPage.php">Home</a></div>
                 <!-- <div><a href="">Current Bids</a></div> -->

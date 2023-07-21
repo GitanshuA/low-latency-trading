@@ -40,7 +40,12 @@ a{
     flex-basis: 100%;
     justify-content: flex-start;
     align-items: center;
-    gap: 20px;
+}
+.nav>.icon:hover{
+    background: transparent;
+}
+.nav>.icon>div>i{
+    margin-right: 20px;
 }
 
 .navbar{
